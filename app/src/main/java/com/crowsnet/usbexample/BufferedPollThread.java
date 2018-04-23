@@ -58,3 +58,4 @@ public interface ReadHandler {
     //this is called for every packet in your custom read handler
     void onReadPacket(byte[] packet);
 }
+}
