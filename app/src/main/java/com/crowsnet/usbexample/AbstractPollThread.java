@@ -77,3 +77,4 @@ private byte[] nextPacket() throws IOException {
     //return the bytePacket we just read
     return bytePacket;
 }
+}
