@@ -1,15 +1,14 @@
 package com.crowsnet.usbexample;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
+import android.support.v7.app.AppCompatActivity;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-public class MainActivity extends AppCompatActivity implements DefaultPollThread.ReadHandler {
+public class MainActivity extends AppCompatActivity implements BufferedPollThread.ReadHandler {
 
-    private DefaultPollThread defaultPollThread;
+    private BufferedPollThread bufferedPollThread;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -18,33 +17,32 @@ public class MainActivity extends AppCompatActivity implements DefaultPollThread
 
         InputStream usbInputStream = null; //Open the FileInputStream to USB here
 
-        usbInputStream = new ByteArrayInputStream("test".getBytes());
+        usbInputStream = new ByteArrayInputStream("testxyzxyz".getBytes());
 
-        defaultPollThread = new DefaultPollThread(usbInputStream);
-        defaultPollThread.start();
+        bufferedPollThread = new BufferedPollThread(usbInputStream);
+        bufferedPollThread.start();
     }
 
     @Override
     public void onDestroy() {
-        defaultPollThread.finish();
+        bufferedPollThread.finish();
         super.onDestroy();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        defaultPollThread.setReadHandler(this);
+        bufferedPollThread.setReadHandler(this);
     }
 
     @Override
     public void onPause() {
-        defaultPollThread.clearReadHandler();
+        bufferedPollThread.clearReadHandler();
         super.onPause();
     }
 
     @Override
     public void onReadPacket(byte[] packet) {
         //This method is called on the UIThread, so you can do all your View updates here
-        Log.d("", "packet read");
     }
 }

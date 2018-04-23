@@ -3,21 +3,38 @@ package com.crowsnet.usbexample;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DefaultPollThread extends AbstractPollThread {
+public class BufferedPollThread extends AbstractPollThread {
+
+    public static final int INITIAL_BUFFER_CAPACITY = 16;
 
     private ReadHandler readHandler;
     private Handler uiThreadHandler = new Handler(Looper.getMainLooper());
 
-    public DefaultPollThread(@NonNull InputStream inputStream) {
+    private List<byte[]> packetBuffer = new ArrayList<>(INITIAL_BUFFER_CAPACITY);
+
+    public BufferedPollThread(@NonNull InputStream inputStream) {
         super(inputStream);
+    }
+
+    public BufferedPollThread(@NonNull InputStream inputStream, int packetSize) {
+        super(inputStream, packetSize);
     }
 
     public void setReadHandler(ReadHandler readHandler) {
         this.readHandler = readHandler;
+
+        synchronized (this) {
+            if (packetBuffer.size() > 0) {
+                for (byte[] packet : packetBuffer)
+                    handlePacket(packet);
+            }
+            packetBuffer.clear();
+        }
     }
 
     public void clearReadHandler() {
@@ -33,8 +50,11 @@ public class DefaultPollThread extends AbstractPollThread {
                     readHandler.onReadPacket(packet);
                 }
             });
-        } else
-            Log.d("", "No readHandler set.");
+        } else {
+            synchronized (this) {
+                packetBuffer.add(packet);
+            }
+        }
     }
 
     public interface ReadHandler {
