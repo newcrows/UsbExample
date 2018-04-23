@@ -17,8 +17,6 @@ public class MainActivity extends AppCompatActivity implements BufferedPollThrea
 
         InputStream usbInputStream = null; //Open the FileInputStream to USB here
 
-        usbInputStream = new ByteArrayInputStream("testxyzxyz".getBytes());
-
         bufferedPollThread = new BufferedPollThread(usbInputStream);
         bufferedPollThread.start();
     }
