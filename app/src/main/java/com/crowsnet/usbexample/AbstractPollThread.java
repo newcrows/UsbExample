@@ -53,7 +53,9 @@ public abstract class AbstractPollThread extends Thread {
 
         int c = 0;
         while (c < packetSize) {
-            c += inputStream.read(bytePacket, c, packetSize - c);
+            int r = inputStream.read(bytePacket, c, packetSize - c);
+            if (r != -1)
+                c += r;
         }
 
         return bytePacket;
